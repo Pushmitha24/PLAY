@@ -1,70 +1,169 @@
-# Getting Started with Create React App
+# Playto – Community Feed Prototype
+(Threaded Comments + 24h Leaderboard)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+## 📌 Project Overview
 
-In the project directory, you can run:
+This project is a full-stack **community feed system** built as part of a technical challenge.
+It demonstrates handling of:
 
-### `npm start`
+- Threaded (nested) comments
+- Likes on posts and comments
+- Karma-based leaderboard
+- Rolling 24-hour aggregation
+- Concurrency-safe backend logic
+- React + Django REST integration
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The goal was **correctness, clarity, and real-world backend reasoning**, not UI polish.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🚀 Tech Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Backend
+- Python
+- Django
+- Django REST Framework
+- SQLite
 
-### `npm run build`
+### Frontend
+- React
+- Axios
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ✨ Features Implemented
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Community posts feed
+- Unlimited nested (threaded) comments
+- Like system for posts and comments
+- Karma tracking
+- 24-hour rolling leaderboard
+- Safe concurrent likes (no duplicates)
+- Frontend ↔ backend integration
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 📁 Project Structure
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+playto_backend/
+├── community/
+│   ├── models.py
+│   ├── views.py
+│   ├── serializers.py
+│   └── urls.py
+├── playto_backend/
+│   ├── settings.py
+│   └── urls.py
+├── manage.py
+└── README.md
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+playto-frontend/
+├── src/
+│   ├── components/
+│   │   ├── Feed.jsx
+│   │   ├── PostCard.jsx
+│   │   ├── CommentTree.jsx
+│   │   └── Leaderboard.jsx
+│   ├── api.js
+│   └── App.js
+└── package.json
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## ⚙️ How to Run the Project
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Backend Setup
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+cd playto_backend
+python -m venv venv
+venv\Scripts\activate
+pip install django djangorestframework
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
 
-### Code Splitting
+Backend runs at:
+```
+http://127.0.0.1:8000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+### Frontend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+cd playto-frontend
+npm install
+npm start
+```
 
-### Making a Progressive Web App
+Frontend runs at:
+```
+http://localhost:3000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🧵 Threaded Comments – Design Explanation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Threaded comments are implemented using a self-referencing foreign key.
 
-### Deployment
+Each comment belongs to a post and may optionally reference another comment as its parent,
+allowing unlimited nesting without recursive database queries.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## ❤️ Likes & Concurrency Safety
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Post Like → **+5 karma**
+- Comment Like → **+1 karma**
+
+Concurrency is handled using database-level uniqueness constraints and atomic transactions
+to prevent duplicate likes and race conditions.
+
+---
+
+## 🏆 Leaderboard Logic (Last 24 Hours)
+
+The leaderboard is calculated dynamically from a `KarmaTransaction` table.
+Only karma earned within the last 24 hours is included.
+
+This avoids cached counters and ensures accurate, real-time rankings.
+
+---
+
+## 🔐 Authentication Note
+
+Authentication was intentionally excluded to focus on backend design and correctness.
+Likes are attributed to a default user for demonstration purposes.
+
+In a production system, this would be replaced with token-based authentication (JWT).
+
+---
+
+## 🧪 How to Test
+
+1. Create users, posts, and comments via Django Admin
+2. Open the frontend
+3. Like posts and comments
+4. Observe leaderboard updates
+
+---
+
+## ✅ Project Status
+
+✔ Backend complete  
+✔ Frontend complete  
+✔ Threaded comments working  
+✔ Leaderboard correct  
+✔ Ready for evaluation  
+
+---
+
+**Project is complete and ready for review.**
